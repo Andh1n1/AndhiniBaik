@@ -32,7 +32,7 @@ body {
 
 h1,
 h2 {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Times New Roman', cursive;
 }
 
 .heading_container {
@@ -148,13 +148,13 @@ a:focus {
 }
 
 .navbar-brand {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Poppins', sans-serif;
 }
 
 .navbar-brand span {
   font-weight: bold;
   font-size: 32px;
-  color: #ffffff;
+  color: White;
 }
 
 .custom_nav-container {
@@ -167,7 +167,7 @@ a:focus {
 
 .custom_nav-container .navbar-nav .nav-item .nav-link {
   padding: 5px 20px;
-  color: #ffffff;
+  color: white;
   text-align: center;
   text-transform: uppercase;
   border-radius: 5px;
@@ -435,13 +435,13 @@ a:focus {
 }
 
 .offer_section .box .detail-box h5 {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Times New Roman', cursive;
   font-size: 24px;
   margin: 0;
 }
 
 .offer_section .box .detail-box h6 {
-  font-family: 'Dancing Script', cursive;
+  font-family: 'Times New Roman', cursive;
   margin: 10px 0;
 }
 
@@ -498,7 +498,7 @@ a:focus {
 }
 
 .food_section .filters_menu li.active {
-  background-color: #222831;
+  background-color: Purple;
   color: #ffffff;
 }
 
