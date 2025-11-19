@@ -1,6 +1,6 @@
 @import url("https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;500;600;700&family=Open+Sans:wght@400;600;700&display=swap");
 body {
-  font-family: "Open Sans", sans-serif;
+  font-family: "Bookman Old Style", sans-serif;
   color: #0c0c0c;
   background-color: #ffffff;
   overflow-x: hidden;
@@ -32,7 +32,7 @@ body {
 
 h1,
 h2 {
-  font-family: 'Times New Roman', cursive;
+  font-family: 'Bookman Old Style', cursive;
 }
 
 .heading_container {
@@ -52,7 +52,7 @@ h2 {
   position: relative;
   margin-bottom: 0;
   font-size: 2.5rem;
-  font-weight: bold;
+  font-weight: 200;
 }
 
 .heading_container h2 span {
@@ -148,12 +148,12 @@ a:focus {
 }
 
 .navbar-brand {
-  font-family: 'Poppins', sans-serif;
+  font-family: 'Bookman Old Style', sans-serif;
 }
 
 .navbar-brand span {
   font-weight: bold;
-  font-size: 32px;
+  font-size: 40px;
   color: White;
 }
 
@@ -343,7 +343,7 @@ a:focus {
 
 .slider_section .detail-box h1 {
   font-size: 3.5rem;
-  font-weight: bold;
+  font-weight: 450;
   margin-bottom: 15px;
 }
 
@@ -498,7 +498,7 @@ a:focus {
 }
 
 .food_section .filters_menu li.active {
-  background-color: Purple;
+  background-color: purple;
   color: #ffffff;
 }
 
