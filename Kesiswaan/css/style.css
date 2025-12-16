@@ -56,7 +56,7 @@ h2 {
 }
 
 .heading_container h2 span {
-  color: #ffbe33;
+  color: #023854;
 }
 
 .heading_container p {
@@ -498,7 +498,7 @@ a:focus {
 }
 
 .food_section .filters_menu li.active {
-  background-color: purple;
+  background-color: #023854;
   color: #ffffff;
 }
 
