@@ -56,7 +56,7 @@ h2 {
 }
 
 .heading_container h2 span {
-  color: #023854;
+  color: #0c0c0c;
 }
 
 .heading_container p {
@@ -411,7 +411,7 @@ a:focus {
   margin-top: 45px;
   border-radius: 5px;
   padding: 20px 15px;
-  background-color: #222831;
+  background-color: #0c0c0c;
   color: #ffffff;
 }
 
@@ -498,7 +498,7 @@ a:focus {
 }
 
 .food_section .filters_menu li.active {
-  background-color: #023854;
+  background-color: #25292e;
   color: #ffffff;
 }
 
