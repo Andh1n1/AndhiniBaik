@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+if(!isset($_SESSION['id'])){
+    header("location:login.php");
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -30,10 +38,9 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
-
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+<link rel="icon" href="/Kesiswaan/images/logo.png" type="image/png">
 </head>
 
 <body>
@@ -66,6 +73,12 @@
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="about.html">Program Kerja</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="pengurus.php">Biodata</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
               </li>
             </ul>
             <div class="user_option">
@@ -148,6 +161,9 @@
 
     </section>
     <!-- end slider section -->
+
+    <?php echo $_SESSION['username']; ?>
+    <h3>Halo, <?php echo $_SESSION['username']; ?></h3>
   </div>
 <section class="offer_section layout_padding-bottom"></section>
 <div class="container">
@@ -445,6 +461,9 @@ Kegiatan pembiasaan untuk tadarus Al-Qur’an sebagai upaya menumbuhkan karakter
       </div>
     </div>
   </section>
+
+  
+  
 
   <!-- end client section -->
 
