@@ -1,5 +1,5 @@
 <?php
-session_start();
+// session_start();
 include 'koneksi.php';
 
 $data = mysqli_query($koneksi, "SELECT * FROM pengurus");
@@ -22,9 +22,12 @@ $data = mysqli_query($koneksi, "SELECT * FROM pengurus");
 <tr>
     <th>No</th>
     <th>Nama Lengkap</th>
+    <th>NIP</th>
     <th>Jabatan</th>
     <th>Bidang</th>
     <th>Masa Jabatan</th>
+    <th>Hapus</th>
+    <th>Update</th>
 </tr>
 
 <?php
@@ -35,9 +38,12 @@ while($d = mysqli_fetch_array($data)){
 <tr>
     <td><?php echo $no++; ?></td>
     <td><?php echo $d['nama_lengkap']; ?></td>
+    <td><?php echo $d['NIP']; ?></td>
     <td><?php echo $d['jabatan']; ?></td>
     <td><?php echo $d['bidang']; ?></td>
     <td><?php echo $d['masa_jabatan']; ?></td>
+    <td><a href="hapus.php?id=<?= $d["user_id"] ?>">hapus</a></td>
+    <td><a href="edit.php?id=<?= $d["user_id"] ?>">update</td>
 </tr>
 
 <?php } ?>

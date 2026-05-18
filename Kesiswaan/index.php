@@ -19,7 +19,7 @@ if(!isset($_SESSION['id'])){
   <meta name="keywords" content="" />
   <meta name="description" content="" />
   <meta name="author" content="" />
-  <link rel="shortcut icon" href="images/favicon.png" type="">
+  <link rel="shortcut icon" href="images/logosmk.ico" type="">
 
   <title> Kesiswaan-SMKN2BE </title>
 

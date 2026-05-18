@@ -6,7 +6,6 @@
 <body>
 
 <h2>Login Kesiswaan</h2>
-
 <form method="POST" action="cek_login.php">
 
 <input type="text" name="username" placeholder="Username"><br><br>
