@@ -1,3 +1,18 @@
+<?php
+// 1. Jalankan session (jika belum berjalan)
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
+
+// 2. Cek apakah user sudah login atau belum. 
+// Sesuaikan $_SESSION['id'] atau $_SESSION['username'] dengan yang kamu pakai di cek_login.php
+if (!isset($_SESSION['id'])) {
+    // Kalau belum login, paksa tendang balik ke halaman login.php
+    header("location:login.php");
+    exit;
+}
+?>
+
 <!DOCTYPE html>
 <html>
 
@@ -30,8 +45,7 @@
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 
-  <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon">
-<link rel="icon" href="/favicon.ico" type="image/x-icon">
+  <link rel="icon" href="/Kesiswaan/images/logo.png" type="image/png">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -46,7 +60,7 @@
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="index.php">
             <span>
               Program Kerja
             </span>
@@ -59,13 +73,13 @@
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
               <li class="nav-item ">
-                <a class="nav-link" href="index.html">Home </a>
+                <a class="nav-link" href="index.php">Home </a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="members.html">Members</a>
+                <a class="nav-link" href="members.php">Members</a>
               </li>
               <li class="nav-item active">
-                <a class="nav-link" href="about.html">Program Kerja<span class="sr-only">(current)</span> </a>
+                <a class="nav-link" href="about.php">Program Kerja<span class="sr-only">(current)</span> </a>
               </li>
             </ul>
           </div>

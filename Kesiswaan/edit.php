@@ -9,15 +9,16 @@ if (isset($_SESSION['role']) && $_SESSION['role'] == 'guru' && $target_id != $_S
     die("Anda tidak berhak mengedit data orang lain!");
 }
 
-// Ambil data lama menggunakan JOIN yang benar
-$query1 = mysqli_query($koneksi, "SELECT username from users");
-$query2 = mysqli_query($koneksi, "SELECT * from pengurus");
+// MENGGUNAKAN 2 QUERY TERPISAH (Sudah diberi WHERE agar data tidak tertukar)
+$query1 = mysqli_query($koneksi, "SELECT username FROM users WHERE id = '$target_id'");
+$query2 = mysqli_query($koneksi, "SELECT * FROM pengurus WHERE user_id = '$target_id'");
+
 $data1 = mysqli_fetch_array($query1);
 $data2 = mysqli_fetch_array($query2);
 
-// Jika ID tidak ditemukan di database, hentikan proses agar tidak error
+// Jika ID tidak ditemukan di tabel pengurus, hentikan proses agar tidak error
 if (!$data2) {
-    die("Data dengan ID tersebut tidak ditemukan di database! Periksa kembali tabel users dan pengurus Anda.");
+    die("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h3>Data dengan ID tersebut tidak ditemukan di database!</h3></div>");
 }
 
 // Proses jika tombol update ditekan
@@ -48,25 +49,201 @@ if (isset($_POST['update'])) {
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="id">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Data</title>
+    <style>
+        /* CSS MODERN MINIMALIS */
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #f4f6f9;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            background-color: #ffffff;
+            width: 100%;
+            max-width: 500px;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+
+        h1 {
+            text-align: center;
+            margin-bottom: 25px;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        h3 {
+            color: #3498db;
+            margin-top: 20px;
+            margin-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+            padding-bottom: 5px;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        input[type="text"],
+        input[type="number"],
+        input[type="password"],
+        select {
+            width: 100%;
+            padding: 10px 14px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            font-size: 14px;
+            background-color: #fff;
+            transition: all 0.3s ease;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        input[readonly] {
+            background-color: #f8f9fa;
+            color: #6c757d;
+            border-color: #e9ecef;
+            cursor: not-allowed;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 25px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+        }
+
+        .btn-submit:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-submit:active {
+            transform: scale(0.98);
+        }
+    </style>
 </head>
 <body>
-    <h2>Edit Data</h2>
+
+<div class="container">
+    <h1>Edit Data</h1>
+    
     <form method="POST" action="">
-        <h4>Akun Login</h4>
-        Username: <input type="text" name="username" value="<?= $data1['username']; ?>" <?= (isset($_SESSION['role']) && $_SESSION['role'] == 'guru') ? 'readonly' : ''; ?> required><br><br>
-        Password Baru: <input type="password" name="password" placeholder="Kosongkan jika tidak ganti"><br>
+        <h3>Akun Login</h3>
         
-        <h4>Biodata Lengkap</h4>
-        Nama Lengkap: <input type="text" name="nama_lengkap" value="<?php echo $data2['nama_lengkap']; ?>" required><br><br>
-        NIP         : <input type="text" name="NIP" value="<?php echo $data2['NIP']; ?>" required><br><br>
-        Jabatan     : <input type="text" name="jabatan" value="<?php echo $data2['jabatan']; ?>" required><br><br>
-        Bidang      : <input type="text" name="bidang" value="<?php echo $data2['bidang']; ?>" required><br><br>
-        Masa Jabatan: <input type="text" name="masa_jabatan" value="<?php echo $data2['masa_jabatan']; ?>" required><br><br>
+        <div class="form-group">
+    <label>Username</label>
+    <input type="text" name="username" placeholder="Masukkan username" value="<?= $data1['username'] ?? ''; ?>" <?= (isset($_SESSION['role']) && $_SESSION['role'] == 'guru') ? 'readonly' : ''; ?> required>
+</div>
         
-        <button type="submit" name="update">Update Data</button>
+        <div class="form-group">
+            <label>Password Baru</label>
+            <input type="password" name="password" placeholder="Kosongkan jika tidak ganti">
+        </div>
+        
+        <h3>Biodata Lengkap</h3>
+        
+        <div class="form-group">
+            <label>Nama Lengkap</label>
+            <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap beserta gelar" value="<?php echo $data2['nama_lengkap']; ?>" required>
+        </div>
+        
+        <input type="text" 
+       inputmode="numeric" 
+       pattern="[0-9]*" 
+       name="NIP" 
+       maxlength="18" 
+       placeholder="Masukkan NIP" 
+       required 
+       oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        
+        <div class="form-group">
+    <label>Jabatan</label>
+    <select name="jabatan" required>
+        <option value="" disabled selected hidden>-- Pilih Jabatan Pekerjaan --</option>
+        
+        <option value="Penanggung Jawab">Penanggung Jawab</option>
+        <option value="Ketua Kesiswaan">Ketua Kesiswaan</option>
+        <option value="Pembina OSIS">Pembina OSIS</option>
+        <option value="Staff Kesiswaan">Staff Kesiswaan</option>
+    </select>
+</div>
+        
+        <div class="form-group">
+    <label>Bidang</label>
+    <select name="bidang" required>
+        <option value="" disabled <?php echo empty(trim($data2['bidang'])) ? 'selected' : ''; ?> hidden>-- Pilih Bidang --</option>
+        
+        <option value="Kesiswaan" <?php echo (trim($data2['bidang']) == 'Kesiswaan') ? 'selected' : ''; ?>>Kesiswaan</option>
+        <option value="Kedisiplinan Putra" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putra') ? 'selected' : ''; ?>>Kedisiplinan Putra</option>
+        <option value="Kedisiplinan Putri" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putri') ? 'selected' : ''; ?>>Kedisiplinan Putri</option>
+        <option value="OSIS" <?php echo (trim($data2['bidang']) == 'OSIS') ? 'selected' : ''; ?>>OSIS</option>
+        <option value="Paskibra" <?php echo (trim($data2['bidang']) == 'Paskibra') ? 'selected' : ''; ?>>Paskibra</option>
+        <option value="Pramuka" <?php echo (trim($data2['bidang']) == 'Pramuka') ? 'selected' : ''; ?>>Pramuka</option>
+        <option value="Kerohanian" <?php echo (trim($data2['bidang']) == 'Kerohanian') ? 'selected' : ''; ?>>Kerohanian</option>
+        <option value="Pecinta Alam" <?php echo (trim($data2['bidang']) == 'Pecinta Alam') ? 'selected' : ''; ?>>Pecinta Alam</option>
+        <option value="PMR" <?php echo (trim($data2['bidang']) == 'PMR') ? 'selected' : ''; ?>>PMR</option>
+        <option value="Kesenian" <?php echo (trim($data2['bidang']) == 'Kesenian') ? 'selected' : ''; ?>>Kesenian</option>
+        <option value="Bahasa" <?php echo (trim($data2['bidang']) == 'Bahasa') ? 'selected' : ''; ?>>Bahasa</option>
+        <option value="Olahraga" <?php echo (trim($data2['bidang']) == 'Olahraga') ? 'selected' : ''; ?>>Olahraga</option>
+        <option value="KKR" <?php echo (trim($data2['bidang']) == 'KKR') ? 'selected' : ''; ?>>KKR</option>
+    </select>
+</div>
+        
+        <div class="form-group">
+    <label>Masa Jabatan (Jumlah Tahun)</label>
+    <input type="text" 
+           inputmode="numeric" 
+           pattern="[0-9]*" 
+           name="masa_jabatan" 
+           maxlength="2" 
+           placeholder="Berapa lama (tahun) menjabat" 
+           required 
+           oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+</div>
+        
+        <button type="submit" name="update" class="btn-submit">Update Data</button>
     </form>
+</div>
+
 </body>
 </html>

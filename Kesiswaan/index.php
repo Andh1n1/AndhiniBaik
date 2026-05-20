@@ -53,7 +53,7 @@ if(!isset($_SESSION['id'])){
     <header class="header_section">
       <div class="container">
         <nav class="navbar navbar-expand-lg custom_nav-container ">
-          <a class="navbar-brand" href="index.html">
+          <a class="navbar-brand" href="index.php">
             <span>
               Kesiswaan SMKN 2 Baleendah
             </span>
@@ -66,13 +66,13 @@ if(!isset($_SESSION['id'])){
           <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav  mx-auto ">
               <li class="nav-item active">
-                <a class="nav-link" href="index.html">Home <span class="sr-only">(current)</span></a>
+                <a class="nav-link" href="index.php">Home <span class="sr-only">(current)</span></a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="members.html">Members</a>
+                <a class="nav-link" href="members.php">Members</a>
               </li>
               <li class="nav-item">
-                <a class="nav-link" href="about.html">Program Kerja</a>
+                <a class="nav-link" href="about.php">Program Kerja</a>
               </li>
               <li class="nav-item">
                 <a class="nav-link" href="pengurus.php">Biodata</a>
