@@ -6,7 +6,7 @@ $username = $_POST['username'];
 $pass     = $_POST['password'];
 
 // Hash password dulu sebelum dibandingkan (sama seperti saat simpan)
-$pass_hash = md5($pass);
+$pass_hash = $pass;
 
 // Query benar: pakai username DAN password, pakai prepared statement style (minimal escape)
 $username_aman = mysqli_real_escape_string($koneksi, $username);
