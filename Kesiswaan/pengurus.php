@@ -1,17 +1,35 @@
 <?php
-// PENGAMAN SESSION: Mencegah error 'Notice: session_start()' jika di koneksi.php sudah ada
+
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
+
 include 'koneksi.php';
 
-// Proteksi Halaman: Jika belum login, tendang ke login.php
 if(!isset($_SESSION['id'])){
     header("location:login.php");
     exit;
 }
 
-$data = mysqli_query($koneksi, "SELECT * FROM pengurus");
+if($_SESSION['role'] == 'admin'){
+
+    $data = mysqli_query($koneksi,
+    "SELECT users.username, pengurus.*
+    FROM users
+    JOIN pengurus ON users.id = pengurus.user_id");
+
+}else{
+
+    $id_user = $_SESSION['id'];
+
+    $data = mysqli_query($koneksi,
+    "SELECT users.username, pengurus.*
+    FROM users
+    JOIN pengurus ON users.id = pengurus.user_id
+    WHERE users.id='$id_user'");
+
+}
+
 ?>
 
 <!DOCTYPE html>
