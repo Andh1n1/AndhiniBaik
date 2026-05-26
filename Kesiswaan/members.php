@@ -81,6 +81,12 @@ if (!isset($_SESSION['id'])) {
               <li class="nav-item">
                 <a class="nav-link" href="about.php">Program Kerja</a>
               </li>
+              <li class="nav-item">
+                <a class="nav-link" href="pengurus.php">Biodata</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
+              </li>
             </ul>
           </div>
         </nav>

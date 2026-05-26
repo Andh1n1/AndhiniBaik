@@ -1,95 +1,64 @@
--- phpMyAdmin SQL Dump
--- version 5.1.1
--- https://www.phpmyadmin.net/
---
--- Host: 127.0.0.1
--- Generation Time: Apr 22, 2026 at 04:05 AM
--- Server version: 10.4.22-MariaDB
--- PHP Version: 7.4.27
+-- ============================================================
+-- DATABASE DUMP: 2526_22db
+-- Sistem Kesiswaan - SMKN 2 Baleendah
+-- ============================================================
+-- Cara pakai:
+-- 1. Buka phpMyAdmin
+-- 2. Klik tab "Import"
+-- 3. Pilih file ini lalu klik "Go"
+-- ATAU jalankan via terminal:
+--   mysql -u 2526_22 -p 2526_22db < 2526_22db.sql
+-- ============================================================
 
-SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
-START TRANSACTION;
-SET time_zone = "+00:00";
+CREATE DATABASE IF NOT EXISTS `2526_22db`
+  CHARACTER SET utf8mb4
+  COLLATE utf8mb4_general_ci;
 
+USE `2526_22db`;
 
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
---
--- Database: `db_tkj`
---
-
--- --------------------------------------------------------
-
---
--- Table structure for table `biodata_guru`
---
-
-CREATE TABLE `biodata_guru` (
-  `id` int(11) NOT NULL,
-  `user_id` int(11) DEFAULT NULL,
-  `nama` varchar(100) NOT NULL,
-  `alamat` text NOT NULL,
-  `tempat_lahir` varchar(50) NOT NULL,
-  `tanggal_lahir` date NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `users`
---
+-- ============================================================
+-- TABEL: users
+-- Menyimpan akun login (admin & guru)
+-- ============================================================
+DROP TABLE IF EXISTS `pengurus`;  -- hapus pengurus dulu karena ada FK ke users
+DROP TABLE IF EXISTS `users`;
 
 CREATE TABLE `users` (
-  `id` int(11) NOT NULL,
-  `username` varchar(50) NOT NULL,
-  `password` varchar(255) NOT NULL,
-  `role` enum('admin','guru') NOT NULL
+  `id`       INT(11)                  NOT NULL AUTO_INCREMENT,
+  `username` VARCHAR(50)              NOT NULL,
+  `password` VARCHAR(255)             NOT NULL,  -- disimpan sebagai MD5 hash
+  `role`     ENUM('admin','guru')     NOT NULL DEFAULT 'guru',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `username` (`username`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
---
--- Dumping data for table `users`
---
+-- ============================================================
+-- TABEL: pengurus
+-- Menyimpan biodata lengkap pengurus kesiswaan
+-- Relasi: pengurus.user_id -> users.id
+-- ============================================================
+CREATE TABLE `pengurus` (
+  `id`           INT(11)      NOT NULL AUTO_INCREMENT,
+  `user_id`      INT(11)      NOT NULL,
+  `nama_lengkap` VARCHAR(100) NOT NULL,
+  `NIP`          VARCHAR(18)  NOT NULL,
+  `jabatan`      VARCHAR(50)  NOT NULL,
+  `bidang`       VARCHAR(50)  NOT NULL,
+  `masa_jabatan` TINYINT(2)   NOT NULL DEFAULT 0,
+  PRIMARY KEY (`id`),
+  KEY `fk_user_id` (`user_id`),
+  CONSTRAINT `fk_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- ============================================================
+-- DATA: 1 akun admin
+-- username : admin
+-- password : admin12345  (MD5 = 7488e331b8b64e5794da3fa4eb10ad5d)
+-- ============================================================
 INSERT INTO `users` (`id`, `username`, `password`, `role`) VALUES
-(1, 'admin', '0192023a7bbd73250516f069df18b500', 'admin');
+(1, 'admin', 'admin12345', 'admin');
 
---
--- Indexes for dumped tables
---
+-- Reset AUTO_INCREMENT agar data pengurus berikutnya mulai dari id yg sesuai
+ALTER TABLE `users`    AUTO_INCREMENT = 2;
+ALTER TABLE `pengurus` AUTO_INCREMENT = 1;
 
---
--- Indexes for table `biodata_guru`
---
-ALTER TABLE `biodata_guru`
-  ADD PRIMARY KEY (`id`);
-
---
--- Indexes for table `users`
---
-ALTER TABLE `users`
-  ADD PRIMARY KEY (`id`),
-  ADD UNIQUE KEY `username` (`username`);
-
---
--- AUTO_INCREMENT for dumped tables
---
-
---
--- AUTO_INCREMENT for table `biodata_guru`
---
-ALTER TABLE `biodata_guru`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
-
---
--- AUTO_INCREMENT for table `users`
---
-ALTER TABLE `users`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
-COMMIT;
-
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;

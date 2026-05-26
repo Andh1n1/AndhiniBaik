@@ -1,41 +1,42 @@
 <?php
-// Pastikan session_start() sudah aktif di koneksi.php atau tambahkan di sini jika belum
 include 'koneksi.php';
 
-$target_id = $_GET['id'];
+$target_id = mysqli_real_escape_string($koneksi, $_GET['id']);
 
 // Kunci Pintu: Jika dia Guru, pastikan dia hanya buka ID miliknya sendiri
 if (isset($_SESSION['role']) && $_SESSION['role'] == 'guru' && $target_id != $_SESSION['id']) {
     die("Anda tidak berhak mengedit data orang lain!");
 }
 
-// MENGGUNAKAN 2 QUERY TERPISAH (Sudah diberi WHERE agar data tidak tertukar)
+// Ambil data dari kedua tabel
 $query1 = mysqli_query($koneksi, "SELECT username FROM users WHERE id = '$target_id'");
 $query2 = mysqli_query($koneksi, "SELECT * FROM pengurus WHERE user_id = '$target_id'");
 
 $data1 = mysqli_fetch_array($query1);
 $data2 = mysqli_fetch_array($query2);
 
-// Jika ID tidak ditemukan di tabel pengurus, hentikan proses agar tidak error
+// Jika ID tidak ditemukan di tabel pengurus, hentikan proses
 if (!$data2) {
     die("<div style='text-align:center; margin-top:50px; font-family:sans-serif;'><h3>Data dengan ID tersebut tidak ditemukan di database!</h3></div>");
 }
 
 // Proses jika tombol update ditekan
 if (isset($_POST['update'])) {
-    $nama_lengkap   = $_POST['nama_lengkap'];
-    $NIP            = $_POST['NIP'];
-    $jabatan        = $_POST['jabatan'];
-    $bidang         = $_POST['bidang'];
-    $masa_jabatan   = $_POST['masa_jabatan'];
-    $username_baru  = $_POST['username'];
-    $password_baru  = $_POST['password'];
+    $nama_lengkap  = mysqli_real_escape_string($koneksi, $_POST['nama_lengkap']);
+    $NIP           = mysqli_real_escape_string($koneksi, $_POST['NIP']);
+    $jabatan       = mysqli_real_escape_string($koneksi, $_POST['jabatan']);
+    $bidang        = mysqli_real_escape_string($koneksi, $_POST['bidang']);
+    $masa_jabatan  = mysqli_real_escape_string($koneksi, $_POST['masa_jabatan']);
+    $username_baru = mysqli_real_escape_string($koneksi, $_POST['username']);
+    $password_baru = $_POST['password'];
 
-    // Update biodata
+    // Update biodata pengurus
     mysqli_query($koneksi, "UPDATE pengurus SET nama_lengkap='$nama_lengkap', NIP='$NIP', jabatan='$jabatan', bidang='$bidang', masa_jabatan='$masa_jabatan' WHERE user_id='$target_id'");
 
-    // Update username
-    mysqli_query($koneksi, "UPDATE users SET username='$username_baru' WHERE id='$target_id'");
+    // Update username (hanya admin yang bisa ubah username)
+    if ($_SESSION['role'] == 'admin') {
+        mysqli_query($koneksi, "UPDATE users SET username='$username_baru' WHERE id='$target_id'");
+    }
 
     // Update password HANYA jika kolomnya diisi
     if (!empty($password_baru)) {
@@ -55,7 +56,6 @@ if (isset($_POST['update'])) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Edit Data</title>
     <style>
-        /* CSS MODERN MINIMALIS */
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -171,9 +171,11 @@ if (isset($_POST['update'])) {
         <h3>Akun Login</h3>
         
         <div class="form-group">
-    <label>Username</label>
-    <input type="text" name="username" placeholder="Masukkan username" value="<?= $data1['username'] ?? ''; ?>" <?= (isset($_SESSION['role']) && $_SESSION['role'] == 'guru') ? 'readonly' : ''; ?> required>
-</div>
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Masukkan username" 
+                   value="<?php echo htmlspecialchars($data1['username'] ?? ''); ?>" 
+                   <?php echo (isset($_SESSION['role']) && $_SESSION['role'] == 'guru') ? 'readonly' : ''; ?> required>
+        </div>
         
         <div class="form-group">
             <label>Password Baru</label>
@@ -184,62 +186,68 @@ if (isset($_POST['update'])) {
         
         <div class="form-group">
             <label>Nama Lengkap</label>
-            <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap beserta gelar" value="<?php echo $data2['nama_lengkap']; ?>" required>
+            <input type="text" name="nama_lengkap" placeholder="Masukkan nama lengkap beserta gelar" 
+                   value="<?php echo htmlspecialchars($data2['nama_lengkap']); ?>" required>
+        </div>
+
+        <!-- BUG FIX: NIP sekarang punya form-group + label + value dari database -->
+        <div class="form-group">
+            <label>NIP (Nomor Induk Pegawai)</label>
+            <input type="text" 
+                   inputmode="numeric" 
+                   pattern="[0-9]*" 
+                   name="NIP" 
+                   maxlength="18" 
+                   placeholder="Masukkan NIP" 
+                   value="<?php echo htmlspecialchars($data2['NIP']); ?>"
+                   required 
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
         </div>
         
-        <input type="text" 
-       inputmode="numeric" 
-       pattern="[0-9]*" 
-       name="NIP" 
-       maxlength="18" 
-       placeholder="Masukkan NIP" 
-       required 
-       oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        <!-- BUG FIX: Jabatan sekarang pre-fill dari database -->
+        <div class="form-group">
+            <label>Jabatan</label>
+            <select name="jabatan" required>
+                <option value="" disabled hidden>-- Pilih Jabatan Pekerjaan --</option>
+                <option value="Penanggung Jawab"  <?php echo (trim($data2['jabatan']) == 'Penanggung Jawab')  ? 'selected' : ''; ?>>Penanggung Jawab</option>
+                <option value="Ketua Kesiswaan"   <?php echo (trim($data2['jabatan']) == 'Ketua Kesiswaan')   ? 'selected' : ''; ?>>Ketua Kesiswaan</option>
+                <option value="Pembina"      <?php echo (trim($data2['jabatan']) == 'Pembina OSIS')      ? 'selected' : ''; ?>>Pembina OSIS</option>
+                <option value="Staff Kesiswaan"   <?php echo (trim($data2['jabatan']) == 'Staff Kesiswaan')   ? 'selected' : ''; ?>>Staff Kesiswaan</option>
+            </select>
+        </div>
         
         <div class="form-group">
-    <label>Jabatan</label>
-    <select name="jabatan" required>
-        <option value="" disabled selected hidden>-- Pilih Jabatan Pekerjaan --</option>
-        
-        <option value="Penanggung Jawab">Penanggung Jawab</option>
-        <option value="Ketua Kesiswaan">Ketua Kesiswaan</option>
-        <option value="Pembina OSIS">Pembina OSIS</option>
-        <option value="Staff Kesiswaan">Staff Kesiswaan</option>
-    </select>
-</div>
-        
-        <div class="form-group">
-    <label>Bidang</label>
-    <select name="bidang" required>
-        <option value="" disabled <?php echo empty(trim($data2['bidang'])) ? 'selected' : ''; ?> hidden>-- Pilih Bidang --</option>
-        
-        <option value="Kesiswaan" <?php echo (trim($data2['bidang']) == 'Kesiswaan') ? 'selected' : ''; ?>>Kesiswaan</option>
-        <option value="Kedisiplinan Putra" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putra') ? 'selected' : ''; ?>>Kedisiplinan Putra</option>
-        <option value="Kedisiplinan Putri" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putri') ? 'selected' : ''; ?>>Kedisiplinan Putri</option>
-        <option value="OSIS" <?php echo (trim($data2['bidang']) == 'OSIS') ? 'selected' : ''; ?>>OSIS</option>
-        <option value="Paskibra" <?php echo (trim($data2['bidang']) == 'Paskibra') ? 'selected' : ''; ?>>Paskibra</option>
-        <option value="Pramuka" <?php echo (trim($data2['bidang']) == 'Pramuka') ? 'selected' : ''; ?>>Pramuka</option>
-        <option value="Kerohanian" <?php echo (trim($data2['bidang']) == 'Kerohanian') ? 'selected' : ''; ?>>Kerohanian</option>
-        <option value="Pecinta Alam" <?php echo (trim($data2['bidang']) == 'Pecinta Alam') ? 'selected' : ''; ?>>Pecinta Alam</option>
-        <option value="PMR" <?php echo (trim($data2['bidang']) == 'PMR') ? 'selected' : ''; ?>>PMR</option>
-        <option value="Kesenian" <?php echo (trim($data2['bidang']) == 'Kesenian') ? 'selected' : ''; ?>>Kesenian</option>
-        <option value="Bahasa" <?php echo (trim($data2['bidang']) == 'Bahasa') ? 'selected' : ''; ?>>Bahasa</option>
-        <option value="Olahraga" <?php echo (trim($data2['bidang']) == 'Olahraga') ? 'selected' : ''; ?>>Olahraga</option>
-        <option value="KKR" <?php echo (trim($data2['bidang']) == 'KKR') ? 'selected' : ''; ?>>KKR</option>
-    </select>
-</div>
+            <label>Bidang</label>
+            <select name="bidang" required>
+                <option value="" disabled <?php echo empty(trim($data2['bidang'])) ? 'selected' : ''; ?> hidden>-- Pilih Bidang --</option>
+                <option value="Kesiswaan"          <?php echo (trim($data2['bidang']) == 'Kesiswaan')          ? 'selected' : ''; ?>>Kesiswaan</option>
+                <option value="Kedisiplinan Putra" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putra') ? 'selected' : ''; ?>>Kedisiplinan Putra</option>
+                <option value="Kedisiplinan Putri" <?php echo (trim($data2['bidang']) == 'Kedisiplinan Putri') ? 'selected' : ''; ?>>Kedisiplinan Putri</option>
+                <option value="OSIS"               <?php echo (trim($data2['bidang']) == 'OSIS')               ? 'selected' : ''; ?>>OSIS</option>
+                <option value="Paskibra"           <?php echo (trim($data2['bidang']) == 'Paskibra')           ? 'selected' : ''; ?>>Paskibra</option>
+                <option value="Pramuka"            <?php echo (trim($data2['bidang']) == 'Pramuka')            ? 'selected' : ''; ?>>Pramuka</option>
+                <option value="Kerohanian"         <?php echo (trim($data2['bidang']) == 'Kerohanian')         ? 'selected' : ''; ?>>Kerohanian</option>
+                <option value="Pecinta Alam"       <?php echo (trim($data2['bidang']) == 'Pecinta Alam')       ? 'selected' : ''; ?>>Pecinta Alam</option>
+                <option value="PMR"                <?php echo (trim($data2['bidang']) == 'PMR')                ? 'selected' : ''; ?>>PMR</option>
+                <option value="Kesenian"           <?php echo (trim($data2['bidang']) == 'Kesenian')           ? 'selected' : ''; ?>>Kesenian</option>
+                <option value="Bahasa"             <?php echo (trim($data2['bidang']) == 'Bahasa')             ? 'selected' : ''; ?>>Bahasa</option>
+                <option value="Olahraga"           <?php echo (trim($data2['bidang']) == 'Olahraga')           ? 'selected' : ''; ?>>Olahraga</option>
+                <option value="KKR"                <?php echo (trim($data2['bidang']) == 'KKR')                ? 'selected' : ''; ?>>KKR</option>
+            </select>
+        </div>
         
         <div class="form-group">
-    <label>Masa Jabatan (Jumlah Tahun)</label>
-    <input type="text" 
-           inputmode="numeric" 
-           pattern="[0-9]*" 
-           name="masa_jabatan" 
-           maxlength="2" 
-           placeholder="Berapa lama (tahun) menjabat" 
-           required 
-           oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-</div>
+            <label>Masa Jabatan (Jumlah Tahun)</label>
+            <input type="text" 
+                   inputmode="numeric" 
+                   pattern="[0-9]*" 
+                   name="masa_jabatan" 
+                   maxlength="2" 
+                   placeholder="Berapa lama (tahun) menjabat" 
+                   value="<?php echo htmlspecialchars($data2['masa_jabatan']); ?>"
+                   required 
+                   oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+        </div>
         
         <button type="submit" name="update" class="btn-submit">Update Data</button>
     </form>

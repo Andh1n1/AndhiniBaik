@@ -1,5 +1,4 @@
 <?php
-// PENGAMAN SESSION: Wajib ditaruh di paling atas agar session terbaca
 if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
@@ -7,21 +6,32 @@ if (session_status() === PHP_SESSION_NONE) {
 include 'koneksi.php';
 
 // Proteksi Halaman: Jika belum login, jangan boleh tambah data
-if(!isset($_SESSION['id'])){
+if (!isset($_SESSION['id'])) {
     header("location:login.php");
     exit;
 }
 
-if(isset($_POST['submit'])){
-    $nama_lengkap = $_POST['nama_lengkap'];
-    $NIP          = $_POST['NIP'];
-    $jabatan      = $_POST['jabatan'];
-    $bidang       = $_POST['bidang'];
-    $masa_jabatan = $_POST['masa_jabatan'];
+// Hanya admin yang boleh tambah data
+if ($_SESSION['role'] != 'admin') {
+    die("<div style='text-align:center;margin-top:50px;font-family:sans-serif;'><h3>Akses Ditolak! Hanya admin yang boleh menambah data.</h3><a href='pengurus.php'>Kembali</a></div>");
+}
 
-    // Menggunakan query panggil nama kolom agar lebih aman dari struktur tabel tertukar
+if (isset($_POST['submit'])) {
+    $nama_lengkap = mysqli_real_escape_string($koneksi, $_POST['nama_lengkap']);
+    $NIP          = mysqli_real_escape_string($koneksi, $_POST['NIP']);
+    $jabatan      = mysqli_real_escape_string($koneksi, $_POST['jabatan']);
+    $bidang       = mysqli_real_escape_string($koneksi, $_POST['bidang']);
+    $masa_jabatan = mysqli_real_escape_string($koneksi, $_POST['masa_jabatan']);
+    $username_baru = mysqli_real_escape_string($koneksi, $_POST['username']);
+    $password_baru = md5($_POST['password']);
+
+    // 1. Insert ke tabel users dulu untuk dapatkan ID
+    mysqli_query($koneksi, "INSERT INTO users (username, password, role) VALUES ('$username_baru', '$password_baru', 'guru')");
+    $new_user_id = mysqli_insert_id($koneksi);
+
+    // 2. Baru insert ke tabel pengurus pakai ID yang baru didapat
     mysqli_query($koneksi, "INSERT INTO pengurus (user_id, nama_lengkap, NIP, jabatan, bidang, masa_jabatan) 
-                            VALUES ('', '$nama_lengkap', '$NIP', '$jabatan', '$bidang', '$masa_jabatan')");
+                            VALUES ('$new_user_id', '$nama_lengkap', '$NIP', '$jabatan', '$bidang', '$masa_jabatan')");
 
     header("location:pengurus.php");
     exit;
@@ -35,7 +45,6 @@ if(isset($_POST['submit'])){
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tambah Pengurus</title>
     <style>
-        /* CSS MODERN MINIMALIS (Senada dengan edit.php) */
         * {
             box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -94,6 +103,7 @@ if(isset($_POST['submit'])){
         }
 
         input[type="text"],
+        input[type="password"],
         select {
             width: 100%;
             padding: 10px 14px;
@@ -152,6 +162,19 @@ if(isset($_POST['submit'])){
     <h1>Tambah Data</h1>
     
     <form method="POST" action="">
+
+        <h3>Akun Login</h3>
+
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" name="username" placeholder="Masukkan username" required autocomplete="off">
+        </div>
+
+        <div class="form-group">
+            <label>Password</label>
+            <input type="password" name="password" placeholder="Masukkan password" required>
+        </div>
+
         <h3>Biodata Lengkap</h3>
         
         <div class="form-group">
@@ -177,7 +200,7 @@ if(isset($_POST['submit'])){
                 <option value="" disabled selected hidden>-- Pilih Jabatan Pekerjaan --</option>
                 <option value="Penanggung Jawab">Penanggung Jawab</option>
                 <option value="Ketua Kesiswaan">Ketua Kesiswaan</option>
-                <option value="Pembina OSIS">Pembina OSIS</option>
+                <option value="Pembina OSIS">Pembina</option>
                 <option value="Staff Kesiswaan">Staff Kesiswaan</option>
             </select>
         </div>

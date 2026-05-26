@@ -45,7 +45,7 @@ if (!isset($_SESSION['id'])) {
   <!-- responsive style -->
   <link href="css/responsive.css" rel="stylesheet" />
 
-  <link rel="icon" href="/Kesiswaan/images/logo.png" type="image/png">
+<link rel="icon" href="/Kesiswaan/images/logo.png" type="image/png">
 
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 </head>
@@ -80,6 +80,12 @@ if (!isset($_SESSION['id'])) {
               </li>
               <li class="nav-item active">
                 <a class="nav-link" href="about.php">Program Kerja<span class="sr-only">(current)</span> </a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="pengurus.php">Biodata</a>
+              </li>
+              <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
               </li>
             </ul>
           </div>
